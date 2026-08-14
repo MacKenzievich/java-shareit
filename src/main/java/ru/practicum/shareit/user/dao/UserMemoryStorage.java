@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.dao;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
@@ -23,11 +22,8 @@ public class UserMemoryStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Long userId) {
-        if (!users.containsKey(userId)){
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-        return users.get(userId);
+    public Optional<User> getUser(Long userId) {
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override

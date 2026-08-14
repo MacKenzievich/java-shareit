@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface UserStorage {
     User createUser(User user);
 
-    User getUser(Long userId);
+    Optional<User> getUser(Long userId);
 
     User updateUser(Long userId, User user);
 

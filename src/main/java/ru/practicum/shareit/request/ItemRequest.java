@@ -12,8 +12,8 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 public class ItemRequest {
-    int id;
-    String description;
-    User requestor;
-    Instant created;
+    private Long id;
+    private String description;
+    private User requestor;
+    private Instant created;
 }
