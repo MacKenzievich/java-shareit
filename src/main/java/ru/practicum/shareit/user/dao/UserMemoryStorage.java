@@ -30,11 +30,13 @@ public class UserMemoryStorage implements UserStorage {
     public User updateUser(Long userId, User user) {
         user.setId(userId);
         users.put(userId, user);
+        emails.add(user.getEmail());
         return user;
     }
 
     @Override
     public void deleteUser(Long userId) {
+        removeEmail(userId);
         users.remove(userId);
     }
 
@@ -42,6 +44,12 @@ public class UserMemoryStorage implements UserStorage {
     public boolean isEmail(String email) {
         return emails.contains(email);
     }
+
+    @Override
+    public void removeEmail(Long userId) {
+        emails.remove(users.get(userId).getEmail());
+    }
+
 
     private Long getNextId() {
         return ++usersId;

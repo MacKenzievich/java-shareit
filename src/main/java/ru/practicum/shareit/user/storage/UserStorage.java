@@ -14,4 +14,6 @@ public interface UserStorage {
     void deleteUser(Long userId);
 
     boolean isEmail(String email);
+
+    void removeEmail(Long userId);
 }

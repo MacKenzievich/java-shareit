@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.request.ItemRequest;
@@ -16,9 +17,8 @@ public class Item {
     private String name;
     @NotBlank
     private String description;
-    @NotBlank
+    @NotNull
     private Boolean available;
-    @NotBlank
     private User owner;
     private ItemRequest requestId;
 }

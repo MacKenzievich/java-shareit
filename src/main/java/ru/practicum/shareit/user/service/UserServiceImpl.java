@@ -5,7 +5,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EmailAlreadyTakenException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UpdateUserDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.storage.UserStorage;
+
+import static ru.practicum.shareit.user.UserMapper.*;
+
 
 @RequiredArgsConstructor
 @Service
@@ -13,24 +18,34 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
     @Override
-    public User getUser(Long userId) {
-        return userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
+    public UserDto getUser(Long userId) {
+        return toUserDto(userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден!")));
     }
 
     @Override
-    public User createUser(User user) {
-        if (userStorage.isEmail(user.getEmail())) {
+    public UserDto createUser(UserDto userDto) {
+        if (userStorage.isEmail(userDto.getEmail())) {
             throw new EmailAlreadyTakenException("Email уже занят");
         }
-        return userStorage.createUser(user);
+        User user = toUser(userDto);
+        return toUserDto(userStorage.createUser(user));
     }
 
     @Override
-    public User updateUser(Long userId, User user) {
-        if (userStorage.isEmail(user.getEmail())) {
-            throw new EmailAlreadyTakenException("Email уже занят");
+    public UpdateUserDto updateUser(Long userId, UpdateUserDto updateUserDto) {
+        User user = userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        if (updateUserDto.getName() != null && !updateUserDto.getName().isBlank()) {
+            user.setName(updateUserDto.getName());
         }
-        return userStorage.updateUser(userId, user);
+        if (updateUserDto.getEmail() != null && !updateUserDto.getEmail().isBlank()) {
+            if (userStorage.isEmail(updateUserDto.getEmail())) {
+                throw new EmailAlreadyTakenException("Email уже занят");
+            }
+            userStorage.removeEmail(userId);
+            user.setEmail(updateUserDto.getEmail());
+        }
+
+        return toUpdateUserDto(userStorage.updateUser(userId, user));
     }
 
     @Override

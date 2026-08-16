@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,10 +67,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text) {
-        List<Item> items = itemStorage.searchByText(text);
-        System.out.println(items);
-        List<ItemDto> itemDtoList = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
-        return itemDtoList;
+        if (!text.isBlank()) {
+            List<Item> items = itemStorage.searchByText(text);
+            System.out.println(items);
+            List<ItemDto> itemDtoList = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+            return itemDtoList;
+        } else {
+            return Collections.emptyList();
+        }
     }
 }
 
