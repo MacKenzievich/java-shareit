@@ -38,13 +38,14 @@ public class UserServiceImpl implements UserService {
             user.setName(updateUserDto.getName());
         }
         if (updateUserDto.getEmail() != null && !updateUserDto.getEmail().isBlank()) {
-            if (userStorage.isEmail(updateUserDto.getEmail())) {
-                throw new EmailAlreadyTakenException("Email уже занят");
+            if (!user.getEmail().equals(updateUserDto.getEmail())) { // если email такой же разрешаем оставить.
+                if (userStorage.isEmail(updateUserDto.getEmail())) {
+                    throw new EmailAlreadyTakenException("Email уже занят");
+                }
+                userStorage.removeEmail(userId);
+                user.setEmail(updateUserDto.getEmail());
             }
-            userStorage.removeEmail(userId);
-            user.setEmail(updateUserDto.getEmail());
         }
-
         return toUpdateUserDto(userStorage.updateUser(userId, user));
     }
 
