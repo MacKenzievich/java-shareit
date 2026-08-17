@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
+
 public class UserMapper {
     public static UpdateUserDto toUpdateUserDto(User user) {
         return new UpdateUserDto(
