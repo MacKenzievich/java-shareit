@@ -1,35 +1,32 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 /**
  * TODO Sprint add-controllers.
  */
 @Entity
-@Table(name = "items", schema = "public")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "items")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private String name;
-    @NotBlank
 
-    @Column(nullable = false)
+    @Column(length = 1000, nullable = false)
     private String description;
 
-    @NotNull
     @Column(name = "is_available")
     private Boolean available;
 
@@ -37,6 +34,7 @@ public class Item {
     @JoinColumn(name = "id_owner", referencedColumnName = "id", nullable = false)
     private User owner;
 
-    @Column(name = "request_id")
-    private Long requestId;
+    @ManyToOne
+    @JoinColumn(name = "request_id", referencedColumnName = "id")
+    private ItemRequest request;
 }

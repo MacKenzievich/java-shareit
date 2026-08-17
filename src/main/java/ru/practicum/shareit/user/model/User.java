@@ -1,18 +1,17 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * TODO Sprint add-controllers.
  */
 @Entity
 @Table(name = "users", schema = "public")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
