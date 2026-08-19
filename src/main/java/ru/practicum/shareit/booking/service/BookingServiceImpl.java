@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Вещь неактивна");
         }
         Booking booking = toBooking(bookingShortDto);
-        if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd() == booking.getStart()) {
+        if (booking.getEnd().isBefore(booking.getStart()) || !booking.getEnd().isAfter(booking.getStart())) {
             throw new ValidationException("невозможно забронировать вещь! ");
         }
         booking.setBooker(user);
@@ -61,16 +61,17 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto approve(Long bookingId, Long userId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking не найден"));
         if (!userId.equals(booking.getItem().getOwner().getId())) {
-            throw new RuntimeException("Вы не являетесь владельцем вещи");
+            throw new ValidationException("Вы не являетесь владельцем вещи");
         }
         if (!booking.getStatus().equals(WAITING)) {
-            throw new RuntimeException("Бронирование уже подтверждено или отклонено");
+            throw new ValidationException("Бронирование уже подтверждено или отклонено");
         }
         if (approved) {
             booking.setStatus(APPROVED);
         } else {
             booking.setStatus(REJECTED);
         }
+        bookingRepository.save(booking);
         return toBookingDto(booking);
     }
 
@@ -79,29 +80,36 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User не найден"));
         List<Booking> bookingDtoList;
-        switch (BookingState.valueOf(state)) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new ValidationException("Неподдерживаемый статус");
+        }
+        LocalDateTime now = LocalDateTime.now();
+        switch (bookingState) {
             case ALL:
-                bookingDtoList = bookingRepository.findAllByItemOwner(user);
+                bookingDtoList = bookingRepository.findAllByItemOwnerOrderByStartDesc(user);
                 break;
             case CURRENT:
-                bookingDtoList = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(user,
-                        LocalDateTime.now(), LocalDateTime.now());
+                bookingDtoList = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfterOrderByStartDesc(user,
+                        now, now);
                 break;
             case PAST:
-                bookingDtoList = bookingRepository.findAllByItemOwnerAndEndBefore(user,
-                        LocalDateTime.now());
+                bookingDtoList = bookingRepository.findAllByItemOwnerAndEndBeforeOrderByStartDesc(user,
+                        now);
                 break;
             case FUTURE:
-                bookingDtoList = bookingRepository.findAllByItemOwnerAndStartAfter(user, LocalDateTime.now());
+                bookingDtoList = bookingRepository.findAllByItemOwnerAndStartAfterOrderByStartDesc(user, now);
                 break;
             case WAITING:
-                bookingDtoList = bookingRepository.findAllByItemOwnerAndStatusEquals(user, WAITING);
+                bookingDtoList = bookingRepository.findAllByItemOwnerAndStatusEqualsOrderByStartDesc(user, WAITING);
                 break;
             case REJECTED:
-                bookingDtoList = bookingRepository.findAllByItemOwnerAndStatusEquals(user, REJECTED);
+                bookingDtoList = bookingRepository.findAllByItemOwnerAndStatusEqualsOrderByStartDesc(user, REJECTED);
                 break;
             default:
-                throw new RuntimeException("Неподдерживаемый статус");
+                throw new ValidationException("Неподдерживаемый статус");
         }
 
         return bookingDtoList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
@@ -112,29 +120,38 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User не найден"));
         List<Booking> bookingDtoList;
-        switch (BookingState.valueOf(state)) {
+        BookingState bookingState;
+
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new ValidationException("Неподдерживаемый статус");
+        }
+        LocalDateTime now = LocalDateTime.now();
+
+        switch (bookingState) {
             case ALL:
-                bookingDtoList = bookingRepository.findAllByBooker(user);
+                bookingDtoList = bookingRepository.findAllByBookerOrderByStartDesc(user);
                 break;
             case CURRENT:
-                bookingDtoList = bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user,
-                        LocalDateTime.now(), LocalDateTime.now());
+                bookingDtoList = bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartDesc(user,
+                        now, now);
                 break;
             case PAST:
-                bookingDtoList = bookingRepository.findAllByBookerAndEndBefore(user,
-                        LocalDateTime.now());
+                bookingDtoList = bookingRepository.findAllByBookerAndEndBeforeOrderByStartDesc(user,
+                        now);
                 break;
             case FUTURE:
-                bookingDtoList = bookingRepository.findAllByBookerAndStartAfter(user, LocalDateTime.now());
+                bookingDtoList = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, now);
                 break;
             case WAITING:
-                bookingDtoList = bookingRepository.findAllByBookerAndStatusEquals(user, WAITING);
+                bookingDtoList = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, WAITING);
                 break;
             case REJECTED:
-                bookingDtoList = bookingRepository.findAllByBookerAndStatusEquals(user, REJECTED);
+                bookingDtoList = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, REJECTED);
                 break;
             default:
-                throw new RuntimeException("Неподдерживаемый статус");
+                throw new ValidationException("Неподдерживаемый статус");
         }
 
         return bookingDtoList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());

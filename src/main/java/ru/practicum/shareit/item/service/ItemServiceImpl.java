@@ -101,9 +101,14 @@ public class ItemServiceImpl implements ItemService {
 
         Map<Long, List<CommentDto>> comments = commentRepository.findByItemIdIn(idItems, Sort.by(Sort.Direction.DESC, "created"))
                 .stream()
-                .map(CommentMapper::toCommentDto)
-                .collect(Collectors.groupingBy(CommentDto::getId));
-        itemDtoList.forEach(i -> i.setComments(comments.get(i.getId())));
+                .collect(Collectors.groupingBy(
+                        comment -> comment.getItem().getId(),
+                        Collectors.mapping(CommentMapper::toCommentDto, Collectors.toList())
+                ));
+
+        itemDtoList.forEach(itemDto ->
+                itemDto.setComments(comments.getOrDefault(itemDto.getId(), List.of()))
+        );
         itemDtoList.sort(comparing(ItemDto::getId));
 
         return itemDtoList;
@@ -127,7 +132,11 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new UserNotFoundException("User не найден"));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item не найден"));
-        if (bookingRepository.isFindBooking(itemId, userId, LocalDateTime.now()) == null) {
+        if (!bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndBefore(
+                itemId,
+                userId,
+                BookingStatus.APPROVED,
+                LocalDateTime.now())) {
             throw new ValidationException("Вы не можете оставить комментарий: бронирование еще не завершилось или отсутствует.");
         }
         Comment comment = toComment(commentShortDto);
@@ -139,22 +148,35 @@ public class ItemServiceImpl implements ItemService {
         return toCommentDto(comment);
     }
 
-
     private void getAllBookingsByItem(List<ItemDto> itemDtoList, List<Long> idItems) {
-        Map<Long, BookingForItemDto> lastBookings = bookingRepository.findFirstByItemIdInAndStartLessThanEqualAndStatus(
-                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
+        LocalDateTime now = LocalDateTime.now();
+
+        Map<Long, List<BookingForItemDto>> lastBookings = bookingRepository.findAllByItemIdInAndStartLessThanEqualAndStatus(
+                        idItems, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
                 .stream()
                 .map(BookingMapper::toBookingForItemDto)
-                .collect(Collectors.toMap(BookingForItemDto::getItemId, Function.identity()));
-        itemDtoList.forEach(i -> i.setLastBooking(lastBookings.get(i.getId())));
+                .collect(Collectors.groupingBy(BookingForItemDto::getItemId));
 
-        Map<Long, BookingForItemDto> nextBookings = bookingRepository.findFirstByItemIdInAndStartAfterAndStatus(
-                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"))
+        Map<Long, List<BookingForItemDto>> nextBookings = bookingRepository.findAllByItemIdInAndStartAfterAndStatus(
+                        idItems, now, BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"))
                 .stream()
                 .map(BookingMapper::toBookingForItemDto)
-                .collect(Collectors.toMap(BookingForItemDto::getItemId, Function.identity()));
-        itemDtoList.forEach(i -> i.setNextBooking(nextBookings.get(i.getId())));
+                .collect(Collectors.groupingBy(BookingForItemDto::getItemId));
 
+        itemDtoList.forEach(itemDto -> {
+            Long itemId = itemDto.getId();
+
+            BookingForItemDto lastBooking = lastBookings.getOrDefault(itemId, List.of()).stream()
+                    .findFirst()
+                    .orElse(null);
+
+            BookingForItemDto nextBooking = nextBookings.getOrDefault(itemId, List.of()).stream()
+                    .findFirst()
+                    .orElse(null);
+
+            itemDto.setLastBooking(lastBooking);
+            itemDto.setNextBooking(nextBooking);
+        });
     }
 
 

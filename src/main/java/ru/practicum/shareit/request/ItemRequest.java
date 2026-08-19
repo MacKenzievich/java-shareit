@@ -8,11 +8,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-item-requests.
  */
 @Entity
+@Table(name = "requests")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,5 +34,5 @@ public class ItemRequest {
 
     @CreationTimestamp
     @Column(name = "created")
-    private LocalDate created;
+    private LocalDateTime created;
 }
