@@ -119,7 +119,7 @@
 										<element>BUNDLE</element>
 										<limits>
 											<limit>
-												<counter>INSTRUCTION</counter>
+                                                <counter>INSTRUCTION</counter>
 												<value>COVEREDRATIO</value>
 												<minimum>0.01</minimum>
 											</limit>
