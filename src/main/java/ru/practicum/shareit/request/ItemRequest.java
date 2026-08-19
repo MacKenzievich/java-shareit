@@ -1,12 +1,13 @@
 package ru.practicum.shareit.request;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.user.User;
+import org.hibernate.annotations.CreationTimestamp;
+import ru.practicum.shareit.user.model.User;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * TODO Sprint add-item-requests.
@@ -16,8 +17,20 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemRequest {
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "description")
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "requester_id")
     private User requestor;
-    private Instant created;
+
+    @CreationTimestamp
+    @Column(name = "created")
+    private LocalDate created;
 }
