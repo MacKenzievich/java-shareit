@@ -60,7 +60,7 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<Object> searchItem(@RequestParam String text,
                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Search by Name: {}", text);
+        log.info("Search  by Name: {}", text);
         if (text.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
         }
