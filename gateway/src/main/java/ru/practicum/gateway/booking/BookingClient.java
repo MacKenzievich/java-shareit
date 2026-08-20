@@ -11,6 +11,7 @@ import ru.practicum.gateway.booking.dto.BookingState;
 import ru.practicum.gateway.client.BaseClient;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+
 import java.util.Map;
 
 @Service
@@ -29,7 +30,7 @@ public class BookingClient extends BaseClient {
 
     public ResponseEntity<Object> getBookings(long userId, BookingState state) {
         Map<String, Object> parameters = Map.of(
-                "state", state.name()        );
+                "state", state.name());
         return get("?state={state}", userId, parameters);
     }
 
