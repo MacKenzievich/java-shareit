@@ -150,7 +150,7 @@ public class ItemServiceImpl implements ItemService {
                 itemId,
                 userId,
                 BookingStatus.APPROVED,
-                LocalDateTime.now().plusDays(1)))  {
+                LocalDateTime.now()))  {
             throw new ValidationException("Вы не можете оставить комментарий: бронирование еще не завершилось или отсутствует.");
         }
         Comment comment = toComment(commentShortDto);

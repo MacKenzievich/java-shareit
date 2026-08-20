@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -35,6 +36,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
+    @Transactional
     public BookingDto create(BookingShortDto bookingShortDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
@@ -58,6 +60,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto approve(Long bookingId, Long userId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking не найден"));
         if (!userId.equals(booking.getItem().getOwner().getId())) {
