@@ -28,7 +28,6 @@ public class ItemMapper {
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
-
                 .build();
     }
 
@@ -40,6 +39,7 @@ public class ItemMapper {
                 .available(itemShortDto.getAvailable())
                 .build();
     }
+
     public static List<ItemDto> toDtoShortList(List<Item> items) {
         if (items != null) {
             return items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
