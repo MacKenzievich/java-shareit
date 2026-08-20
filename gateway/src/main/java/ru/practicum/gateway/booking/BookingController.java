@@ -31,9 +31,9 @@ public class BookingController {
     public ResponseEntity<Object> getOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                            @RequestParam(name = "state", defaultValue = "all") String stateParam,
                                            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0")
-                                                             Integer from,
+                                           Integer from,
                                            @Positive @RequestParam(name = "size", defaultValue = "10")
-                                                             Integer size) {
+                                           Integer size) {
         return bookingClient.getBookingCurrentOwner(userId, bookingStateFrom(stateParam), from, size);
     }
 
