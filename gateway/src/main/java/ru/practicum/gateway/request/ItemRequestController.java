@@ -10,8 +10,8 @@ import ru.practicum.gateway.request.dto.ItemRequestRequestDto;
 
 import jakarta.validation.Valid;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 
 @Controller
 @RequiredArgsConstructor

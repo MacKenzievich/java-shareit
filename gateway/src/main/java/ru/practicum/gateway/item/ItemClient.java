@@ -11,7 +11,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.gateway.client.BaseClient;
 import ru.practicum.gateway.item.dto.CommentShortDto;
 import ru.practicum.gateway.item.dto.ItemDto;
-import ru.practicum.gateway.item.dto.ItemRequestDto;
 
 import java.util.Map;
 
@@ -42,12 +41,8 @@ public class ItemClient extends BaseClient {
         return post("", userId, itemDto);
     }
 
-    public ResponseEntity<Object> updateItem(ItemRequestDto requestDto, Long itemId, long userId) {
-        return patch("/" + itemId, userId, requestDto);
-    }
-
-    public ResponseEntity<Object> deleteItem(Long itemId) {
-        return delete("/" + itemId);
+    public ResponseEntity<Object> updateItem(ItemDto itemDto, Long itemId, long userId) {
+        return patch("/" + itemId, userId, itemDto);
     }
 
     public ResponseEntity<Object> searchItem(long userId, String text) {

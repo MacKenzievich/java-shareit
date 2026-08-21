@@ -1,5 +1,6 @@
 package ru.practicum.gateway.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.gateway.user.dto.UpdateUserDto;
 import ru.practicum.gateway.user.dto.UserRequestDto;
 import ru.practicum.gateway.util.Create;
-import ru.practicum.gateway.util.Update;
 
 @Controller
 @RequestMapping("/users")
@@ -17,12 +17,6 @@ import ru.practicum.gateway.util.Update;
 @RequiredArgsConstructor
 public class UserController {
     private final UserClient userClient;
-
-    @GetMapping
-    public ResponseEntity<Object> getUsers() {
-        log.info("Getting all users");
-        return userClient.getUsers();
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getUser(@PathVariable Long id) {
@@ -37,7 +31,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@Validated(Update.class) @RequestBody UpdateUserDto updateUserDto,
+    public ResponseEntity<Object> updateUser(@Valid @RequestBody UpdateUserDto updateUserDto,
                                              @PathVariable("userId") Long userId) {
         log.info("Gateway: Updating user id={}, dto={}", userId, updateUserDto);
         return userClient.updateUser(userId, updateUserDto);

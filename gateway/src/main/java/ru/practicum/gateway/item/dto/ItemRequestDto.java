@@ -5,20 +5,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemRequestDto {
-    @NotBlank
-    private String name;
+    private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
-    @NotNull
-    private Boolean available;
+    private LocalDateTime created;
 
-    private Long requestId;
+
+    private List<ItemResponseDto> items;
 }

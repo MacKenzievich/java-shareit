@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import ru.practicum.gateway.item.dto.CommentShortDto;
 import ru.practicum.gateway.item.dto.ItemDto;
-import ru.practicum.gateway.item.dto.ItemRequestDto;
-
 import jakarta.validation.Valid;
 
 
@@ -44,17 +42,11 @@ public class ItemController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateItem(@Valid @RequestBody ItemRequestDto requestDto,
+    public ResponseEntity<Object> updateItem(@Valid @RequestBody ItemDto itemDto,
                                              @PathVariable Long id,
                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Update Item with Id: {}", id);
-        return itemClient.updateItem(requestDto, id, userId);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteItem(@PathVariable Long id) {
-        log.info("Delete Item with Id: {}", id);
-        return itemClient.deleteItem(id);
+        return itemClient.updateItem(itemDto, id, userId);
     }
 
     @GetMapping("/search")

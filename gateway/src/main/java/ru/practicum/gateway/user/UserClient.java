@@ -27,10 +27,6 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getUsers() {
-        return get("");
-    }
-
     public ResponseEntity<Object> getUser(Long userId) {
         return get("/" + userId);
     }
