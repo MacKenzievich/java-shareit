@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -51,11 +52,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User не найден!");
         }
-        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() ->
-                new RequestNotFoundException("Request не найден!"));
-
-        List<ItemDto>  items = ItemMapper.toDtoShortList(itemRepository
-                .findByRequest_IdOrderById(requestId));
+        ItemRequest itemRequest = itemRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RequestNotFoundException("Request не найден!"));
+        List<ItemShortDto> items = itemRepository.findByRequest_IdOrderById(requestId).stream()
+                .map(ItemMapper::toItemShortDto)
+                .collect(Collectors.toList());
         ItemRequestDto itemRequestDto = ItemRequestMapper.toDto(itemRequest);
         itemRequestDto.setItems(items);
         return itemRequestDto;
@@ -101,12 +102,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         for (ItemRequest itemRequest : requests) {
             List<Item> itemsTemp = itemsByRequestId.getOrDefault(itemRequest.getId(), List.of());
-
-            List<ItemDto> itemDtoForRequests = itemsTemp.stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
-
-            itemRequestDto.add(ItemRequestMapper.toItemRequestDto(itemRequest, itemDtoForRequests));
+            itemRequestDto.add(ItemRequestMapper.toItemRequestDto(itemRequest, itemsTemp));
         }
 
         return itemRequestDto;

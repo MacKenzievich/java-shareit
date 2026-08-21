@@ -39,6 +39,19 @@ public class ItemMapper {
                 .available(itemShortDto.getAvailable())
                 .build();
     }
+    public static ItemShortDto toItemShortDto(Item item) {
+        if (item == null) {
+            return null;
+        }
+        return ItemShortDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
+                .ownerId(item.getOwner() != null ? item.getOwner().getId() : null)
+                .build();
+    }
 
     public static List<ItemDto> toDtoShortList(List<Item> items) {
         if (items != null) {

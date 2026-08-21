@@ -67,4 +67,12 @@ public class ErrorHandler {
         map.put("error", ex.toString());
         return new ResponseEntity<>(map, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(org.springframework.web.bind.MissingRequestHeaderException.class)
+    public ResponseEntity<Map<String, String>> handleMissingHeaderException(final org.springframework.web.bind.MissingRequestHeaderException ex) {
+        log.error("MissingRequestHeaderException {}", ex.getMessage());
+        Map<String, String> map = new HashMap<>();
+        map.put("error", ex.getMessage());
+        return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST); // Возвращаем 400 Bad Request
+    }
 }
