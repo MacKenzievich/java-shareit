@@ -39,6 +39,7 @@ public class ItemMapper {
                 .available(itemShortDto.getAvailable())
                 .build();
     }
+
     public static ItemShortDto toItemShortDto(Item item) {
         if (item == null) {
             return null;
